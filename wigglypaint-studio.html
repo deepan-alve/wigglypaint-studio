@@ -8445,10 +8445,10 @@ resize(),requestAnimationFrame(loop)
 #wp-studio.min>*:not(h3){display:none}
 </style>
 <div id="wp-studio">
- <h3 id="wp-drag" title="drag to move">Lyric studio <button id="wp-min" title="minimise">–</button></h3>
+ <h3 id="wp-drag" title="drag to move">WigglyPaint studio <button id="wp-min" title="minimise">–</button></h3>
  <label>Scene<select id="wp-scene"></select></label>
- <label>Lyric, small line<span class="row"><input id="wp-small" placeholder="required"><button class="paste" data-for="wp-small" title="paste">Paste</button></span></label>
- <label>Lyric, big word<span class="row"><input id="wp-big" placeholder="required"><button class="paste" data-for="wp-big" title="paste">Paste</button></span></label>
+ <label>Lyric, small line<span class="row"><input id="wp-small" placeholder="required for lyric scenes"><button class="paste" data-for="wp-small" title="paste">Paste</button></span></label>
+ <label>Lyric, big word<span class="row"><input id="wp-big" placeholder="required for lyric scenes"><button class="paste" data-for="wp-big" title="paste">Paste</button></span></label>
  <label>Lyric, last line<span class="row"><input id="wp-tail" placeholder="optional"><button class="paste" data-for="wp-tail" title="paste">Paste</button></span></label>
  <button class="run" id="wp-draw">Draw scene</button>
  <div id="wp-buttons"></div>
@@ -10200,6 +10200,74 @@ show();
 }
 
 },
+"cat":()=>{
+// Plain-art scene for WigglyPaint: a cat holding a steaming mug, no lyric, using the whole canvas.
+// Needs lyric-lib.js loaded first (the studio page bundles both). With no lyric call it draws without any text.
+
+{
+const{layer,backdrop,clear,bez,trace,show,C:{INK,PAPER,ORANGE,TAN,PINK,RED,YELLOW,LGRAY,BROWN},PI,rnd}=lyricKit();
+clear();
+
+backdrop({color:YELLOW,calm:[182,160]});          // canvas centre is (182,152)
+
+// --- geometry (deck pixels) ---
+const HEAD=[182,112],BODY=[182,206];
+const earL=g=>{g.moveTo(140,92);g.lineTo(146,48);g.lineTo(172,78)},earR=g=>{g.moveTo(224,92);g.lineTo(218,48);g.lineTo(192,78)};
+const head=g=>{g.beginPath();g.ellipse(...HEAD,48,40,0,0,2*PI)};
+const body=g=>{g.beginPath();g.ellipse(...BODY,58,62,0,0,2*PI)};
+const tail=bez([210,252],[296,262],[302,186],[278,152]);
+const MUG=[160,210,44,36];                         // x, y, w, h
+
+// 0) knock the dots out behind the cat
+layer(PAPER,g=>{body(g);g.fill();head(g);g.fill();g.beginPath();earL(g);earR(g);g.fill()});
+
+// 1) tail first so the body hides its root; its tip swishes a little per frame
+const swish=(g,f)=>{g.beginPath();trace(g,t=>{const[x,y]=tail(t);return[x+f*3*t,y]});g.stroke()};
+layer(INK,(g,f)=>{g.lineWidth=17;swish(g,f)});
+layer(ORANGE,(g,f)=>{g.lineWidth=12;swish(g,f)});
+
+// 2) fur: orange body and head, tan belly and muzzle
+layer(ORANGE,g=>{body(g);g.fill();head(g);g.fill();g.beginPath();earL(g);earR(g);g.fill()});
+layer(TAN,g=>{g.beginPath();g.ellipse(182,222,34,40,0,0,2*PI);g.fill();
+ g.beginPath();g.ellipse(182,128,22,15,0,0,2*PI);g.fill()});
+layer(PINK,g=>{g.beginPath();g.moveTo(148,82);g.lineTo(150,60);g.lineTo(164,78);g.fill();
+ g.beginPath();g.moveTo(216,82);g.lineTo(214,60);g.lineTo(200,78);g.fill();
+ g.beginPath();g.ellipse(160,126,7,4,0,0,2*PI);g.ellipse(204,126,7,4,0,0,2*PI);g.fill()});   // ears + cheeks
+
+// 3) stripes, then the outlines on top
+layer(BROWN,g=>{g.lineWidth=3;for(const x of[168,182,196]){g.beginPath();g.moveTo(x,74);g.lineTo(x+(182-x)*.2,90);g.stroke()}
+ for(const y of[176,196,216]){g.beginPath();g.moveTo(126,y);g.quadraticCurveTo(136,y+4,140,y+12);g.stroke();
+  g.beginPath();g.moveTo(238,y);g.quadraticCurveTo(228,y+4,224,y+12);g.stroke()}});
+layer(INK,g=>{g.lineWidth=2.8;body(g);g.stroke();head(g);g.stroke();g.beginPath();earL(g);earR(g);g.stroke()});
+
+// 4) face: closed happy eyes, nose, mouth, whiskers that twitch per frame
+layer(INK,(g,f)=>{g.lineWidth=2.4;
+ for(const x of[164,200]){g.beginPath();g.arc(x,110,7,PI*1.1,PI*1.9);g.stroke()}
+ g.beginPath();g.moveTo(182,122);g.quadraticCurveTo(182,130,174,132);g.moveTo(182,122);g.quadraticCurveTo(182,130,190,132);g.stroke();
+ g.lineWidth=1.4;for(const s of[-1,1])for(const dy of[-3,3]){g.beginPath();g.moveTo(182+s*24,124+dy);
+  g.lineTo(182+s*(52+rnd(0,3)),121+dy*2+f-1);g.stroke()}});
+layer(RED,g=>{g.beginPath();g.moveTo(177,118);g.lineTo(187,118);g.lineTo(182,124);g.fill()});
+
+// 5) the mug, held in both paws
+const mug=g=>{g.beginPath();g.roundRect(MUG[0],MUG[1],MUG[2],MUG[3],5)};
+layer(RED,g=>{mug(g);g.fill()});
+layer(PAPER,g=>{g.beginPath();g.arc(MUG[0]+22,MUG[1]+20,8,0,2*PI);g.fill()});                  // heart badge, white disc
+layer(PINK,g=>{const[x,y]=[MUG[0]+22,MUG[1]+22];g.beginPath();g.moveTo(x,y+5);
+ g.bezierCurveTo(x-9,y-2,x-4,y-9,x,y-4);g.bezierCurveTo(x+4,y-9,x+9,y-2,x,y+5);g.fill()});
+layer(BROWN,g=>{g.beginPath();g.ellipse(MUG[0]+22,MUG[1]+3,19,4,0,0,2*PI);g.fill()});          // coffee
+layer(INK,g=>{g.lineWidth=2.6;mug(g);g.stroke();
+ g.beginPath();g.arc(MUG[0]+MUG[2]+2,MUG[1]+18,10,-PI/2,PI/2);g.stroke()});                    // handle
+layer(ORANGE,g=>{for(const x of[MUG[0]-6,MUG[0]+MUG[2]-6]){g.beginPath();g.ellipse(x+6,MUG[1]+24,10,8,0,0,2*PI);g.fill()}});
+layer(INK,g=>{g.lineWidth=2.2;for(const x of[MUG[0]-6,MUG[0]+MUG[2]-6]){g.beginPath();g.ellipse(x+6,MUG[1]+24,10,8,0,0,2*PI);g.stroke()}});
+
+// 6) steam: three wisps that rise one step each frame, kept below the chin
+layer(LGRAY,(g,f)=>{g.lineWidth=3;for(const[i,x]of[[0,170],[1,182],[2,194]]){const y=MUG[1]-6-((f+i)%3)*4;
+ g.beginPath();g.moveTo(x,y);g.bezierCurveTo(x-7,y-7,x+7,y-13,x,y-20);g.stroke()}});
+
+show();
+}
+
+},
 "apple":()=>{
 // Paste into the devtools console of WigglyPaint (served from http://localhost, on the "main" card).
 // Drives Decker with synthetic mouse events and steps its loop by hand, so it works even when
@@ -10332,7 +10400,7 @@ step(10);
 }
 
 }};
-const META=[{"key": "kajal", "label": "Eye + kajal", "slow": false, "lyric": true}, {"key": "lolaakku", "label": "Ear + jhumka", "slow": false, "lyric": true}, {"key": "mascara", "label": "Eyelash + mascara", "slow": false, "lyric": true}, {"key": "lipstick", "label": "Lips + lipstick", "slow": false, "lyric": true}, {"key": "bangles", "label": "Hand + glass bangles", "slow": false, "lyric": true}, {"key": "kolusu", "label": "Foot + anklet", "slow": false, "lyric": true}, {"key": "pottu", "label": "Face + pottu + foundation", "slow": false, "lyric": true}, {"key": "dhavani", "label": "Silk dhavani at the hip", "slow": false, "lyric": true}, {"key": "boy", "label": "Boy asking", "slow": false, "lyric": true}, {"key": "natural", "label": "Even without all that", "slow": false, "lyric": true}, {"key": "doll", "label": "Sugar-crystal doll", "slow": false, "lyric": true}, {"key": "malli", "label": "Jasmine in her hair", "slow": false, "lyric": true}, {"key": "raani", "label": "Kalli raani", "slow": false, "lyric": true}, {"key": "sooniyam", "label": "Enchantress", "slow": false, "lyric": true}, {"key": "apple", "label": "Apple", "slow": true, "lyric": false}, {"key": "pup", "label": "Puppy", "slow": true, "lyric": false}, {"key": "robot", "label": "Robot", "slow": true, "lyric": false}];
+const META=[{"key": "kajal", "label": "Eye + kajal", "slow": false, "lyric": true}, {"key": "lolaakku", "label": "Ear + jhumka", "slow": false, "lyric": true}, {"key": "mascara", "label": "Eyelash + mascara", "slow": false, "lyric": true}, {"key": "lipstick", "label": "Lips + lipstick", "slow": false, "lyric": true}, {"key": "bangles", "label": "Hand + glass bangles", "slow": false, "lyric": true}, {"key": "kolusu", "label": "Foot + anklet", "slow": false, "lyric": true}, {"key": "pottu", "label": "Face + pottu + foundation", "slow": false, "lyric": true}, {"key": "dhavani", "label": "Silk dhavani at the hip", "slow": false, "lyric": true}, {"key": "boy", "label": "Boy asking", "slow": false, "lyric": true}, {"key": "natural", "label": "Even without all that", "slow": false, "lyric": true}, {"key": "doll", "label": "Sugar-crystal doll", "slow": false, "lyric": true}, {"key": "malli", "label": "Jasmine in her hair", "slow": false, "lyric": true}, {"key": "raani", "label": "Kalli raani", "slow": false, "lyric": true}, {"key": "sooniyam", "label": "Enchantress", "slow": false, "lyric": true}, {"key": "cat", "label": "Cat with a coffee mug", "slow": false, "lyric": false}, {"key": "apple", "label": "Apple", "slow": true, "lyric": false}, {"key": "pup", "label": "Puppy", "slow": true, "lyric": false}, {"key": "robot", "label": "Robot", "slow": true, "lyric": false}];
 const LYRICS={"kajal": {"small": "கண்ணுக்கு", "big": "காஜல்"}, "lolaakku": {"small": "ஜோடியா காதோரம் ஒரு", "big": "லோலாக்கு"}, "mascara": {"small": "ஐலாஷ்ல", "big": "மஸ்காரா", "tail": "இரு"}, "lipstick": {"small": "LAKME", "big": "Lipstick-ku"}};
 const $=id=>document.getElementById(id), hint=t=>$('wp-hint').textContent=t;
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
@@ -10353,18 +10421,18 @@ const run=async m=>{all().forEach(b=>b.disabled=true);
   const sample=Object.values(window.WP_TEXT).join(' ')||'அ';
   await Promise.all(["800 40px 'Noto Sans Tamil'","400 40px 'Anton'","700 26px 'Bebas Neue'","400 40px 'Pacifico'","400 46px 'Antonio'","400 50px 'Luckiest Guy'"].map(f=>document.fonts.load(f,sample)));
   if(m.slow){clear();hint(m.label+': drawing stroke by stroke, the page freezes ~15s…');await wait(60)}
-  const t0=performance.now();SCRIPTS[m.key]();for(let i=0;i<6;i++)tick();sync();
+  const t0=performance.now();(m.fn||SCRIPTS[m.key])();for(let i=0;i<6;i++)tick();sync();
   hint(m.label+' done in '+((performance.now()-t0)/1000).toFixed(1)+'s. EXPORT saves the GIF.')}
  catch(e){hint('Error: '+e.message);console.error(e)}
  finally{all().forEach(b=>b.disabled=false)}};
-// lyric scenes: one drawing + one fixed lyric each. Text is saved per scene in this browser,
-// falling back to lyrics.json baked in at build time. A scene never draws without its lyric.
+// code-drawn scenes go in the dropdown. Lyric scenes pair one drawing with one lyric, saved per scene in this
+// browser and falling back to lyrics.json baked in at build time; they never draw without it. Plain art ignores the boxes.
 const KEY='wp-lyric:';
 const store={get:k=>{try{return JSON.parse(localStorage.getItem(KEY+k))}catch(e){return null}},
              set:(k,v)=>{try{localStorage.setItem(KEY+k,JSON.stringify(v))}catch(e){}}};
-const scenes=META.filter(m=>m.lyric), extras=META.filter(m=>!m.lyric);
+const scenes=META.filter(m=>!m.slow), extras=META.filter(m=>m.slow);
 const lyricOf=k=>store.get(k)||LYRICS[k]||{small:'',big:''};
-for(const m of scenes){const o=document.createElement('option');o.value=m.key;o.textContent=m.label;$('wp-scene').appendChild(o)}
+for(const m of scenes){const o=document.createElement('option');o.value=m.key;o.textContent=m.label+(m.lyric?'':'  (no lyric)');$('wp-scene').appendChild(o)}
 const load=()=>{const l=lyricOf($('wp-scene').value);$('wp-small').value=l.small||'';$('wp-big').value=l.big||'';$('wp-tail').value=l.tail||''};
 const save=()=>store.set($('wp-scene').value,{small:$('wp-small').value.trim(),big:$('wp-big').value.trim(),tail:$('wp-tail').value.trim()});
 $('wp-scene').onchange=load;$('wp-small').oninput=$('wp-big').oninput=$('wp-tail').oninput=save;load();
@@ -10372,6 +10440,13 @@ $('wp-draw').onclick=()=>run(scenes.find(m=>m.key===$('wp-scene').value));
 for(const m of extras){const b=document.createElement('button');b.className='run';b.textContent=m.label+'  (slow, no lyric)';
  b.onclick=()=>run(m);$('wp-buttons').appendChild(b)}
 $('wp-clear').onclick=async()=>{await ensureMain();clear();hint('Canvas cleared.')};
+// #run=draw-foo.js loads that file from this folder and draws it, without a rebuild: edit, refresh, look.
+// Plain filenames only (letters, digits, - _ and / between them), so the link can't pull in another site's code.
+{const f=decodeURIComponent((location.hash.match(/[#&]run=([^&]+)/)||[])[1]||'');
+ if(/^[\w-]+(\/[\w-]+)*\.js$/.test(f))fetch(f,{cache:'no-store'}).then(r=>{if(!r.ok)throw Error(f+': HTTP '+r.status);return r.text()})
+  .then(src=>{const fn=new Function(src);run({key:'#run',label:f,slow:false,lyric:false,fn})})
+  .catch(e=>{hint('Error: '+e.message);console.error(e)});
+ else if(f)hint('#run wants a file in this folder, like #run=draw-cat.js')}
 $('wp-min').onclick=()=>{const p=$('wp-studio');p.classList.toggle('min');$('wp-min').textContent=p.classList.contains('min')?'+':'–'};
 // drag the panel by its title bar (it can cover the markers otherwise)
 {const p=$('wp-studio');let d=null;
