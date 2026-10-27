@@ -4,6 +4,14 @@ Code-drawn, boiling-line animations for [WigglyPaint](https://internet-janitor.i
 Write a scene in plain JavaScript (canvas 2D calls), press a button, and it lands in WigglyPaint's
 three animation frames with the hand-drawn wobble. Hit **EXPORT** and you have a looping GIF.
 
+### Showcase: *Sarpatta*, cut to music
+
+[![Lyric cards from the studio, edited to a song from Sarpatta Parambarai. Click to play.](docs/showcase/sarpatta-poster.jpg)](https://deepan-alve.github.io/wigglypaint-studio/docs/showcase/sarpatta.mp4)
+
+A 44-second vertical edit built entirely from studio scenes ([play it](https://deepan-alve.github.io/wigglypaint-studio/docs/showcase/sarpatta.mp4)
+or [download](docs/showcase/sarpatta.mp4)). The song belongs to its rights holders and is **not**
+covered by this repo's MIT license.
+
 | | | |
 |:-:|:-:|:-:|
 | ![kajal](docs/gallery/kajal.gif) | ![raani](docs/gallery/raani.gif) | ![boy](docs/gallery/boy.gif) |
