@@ -1,0 +1,103 @@
+# wiggler.0p -- used by: contraption wiggler
+delta:"%j"parse"[-2,-1,-1,0,1,1,2]"
+on set_flip x do fl.value:x end
+on set_hishape x do sh.data:image[x].map[1,0] end
+on set_ershape x do er.data:image[x] end
+on set_brush x do br.text:x end
+on get_frames do fr.images end
+on set_frames do fr.images:x end
+on get_canv do c end
+on set_mirrormode vh do mirror.data:vh end
+on get_mirrormode do mirror.data end
+
+on wig    x do return random[-1,0,1 2]+x end
+on wiggle x do return random[delta  2]+x end
+
+on draw x o frames do
+ if "eraser"~br.text
+  brush["Eraser" er.data]
+  c.brush:"Eraser"
+  c.pattern:0
+  each f in frames
+   c.paste[f]
+   c.line[o x]
+   f.paste[c.copy[]]
+  end
+  c.pattern:1
+ elseif "hi"~2 take br.text
+  pat:0+2 drop br.text
+  img:image[sh.text]
+  s:img.size
+  y:x-s/2
+  each f in frames
+   w:wiggle[y]
+   f.paste[img.copy[].merge[f.copy[w s].map[1 dict 1 pat]] w 1]
+  end
+ elseif "pen"~br.text
+  c.brush:1
+  each f in frames
+   c.paste[f]
+   c.line[o wig[x]]
+   f.paste[c.copy[]]
+  end
+ elseif "pencil"~br.text
+  c.brush:0
+  each f in frames
+   c.paste[f]
+   c.line[wiggle[o] wiggle[x]]
+   f.paste[c.copy[]]
+  end
+ else
+  c.brush:br.text
+  each f in frames
+   c.paste[f]
+   c.line[wiggle[o] wiggle[x]]
+   f.paste[c.copy[]]
+  end
+ end
+end
+
+on drag x do
+ if !card.locked
+  m:mirror.data
+  o:if pointer.down x else pointer.prev-card.offset end
+  frames:get_frames[]
+  fs:(first frames).size
+  draw[x o frames]
+
+  # mirrored drawing:
+  if m[0]  draw[(x[0],(fs[1]-x[1])) (o[0],(fs[1]-o[1])) frames] end
+  if m[1]  draw[((fs[0]-x[0]),x[1]) ((fs[0]-o[0]),o[1]) frames] end
+  if m~1,1 draw[(fs-x)              (fs-o)              frames] end
+
+  if !app.playing
+   pensounds:"%j"parse"{l}
+    'Blobby'     :['wipe1','wipe2','wipe3'],
+    'eraser'     :['erase1','erase2'],
+    'StippleTiny':['stip1','stip2','stip3'],
+    'pencil'     :['pencil1','pencil2'],
+    'SoftLrg'    :['spray1','spray2'],
+    'pen'        :['pen1','pen2'],
+   {r}"
+   play[random[("squeak1","squeak2") unless pensounds[br.text]]]
+  end
+ end
+end
+
+on click x do
+ card.event["begin"]
+ drag[x]
+end
+
+on view do
+ frames:get_frames[]
+ each f in frames f.size:card.size end
+ c.show:card.show
+ c.clear[]
+ i:frames[3%sys.frame/5] 
+ c.paste[if fl.value i.copy[].transform["horiz"] else i end]
+end
+
+on get_animate do
+ on animate do view[] end
+end

@@ -1,0 +1,36 @@
+# alter.6 -- used by: card alter / fit (button)
+on tween t a b do
+ a+(b-a)*t^2
+end
+
+on click do
+ top   .value:0
+ left  .value:0
+ right .value:0
+ bottom.value:0
+ f:scrungle[main.widgets.target.frames[0].copy[]]
+ w:f.size[0]
+ h:f.size[1]
+ on scan ctrl lim rect size step do
+  done:0
+  v:ctrl.value
+  while (!done)&v<lim
+   if 1<count keys f.copy[rect size].hist
+    done:1
+   else
+    v:v+1
+    rect:rect+step
+   end
+  end
+  each t in range 11
+   ctrl.value:tween[t/10 ctrl.value v]
+   play["click"]
+   view[]
+   sleep[]
+  end
+ end
+ scan[left   w (   0 ,   0 ) (1,h) ( 1, 0)]
+ scan[right  w ((w-2),   0 ) (1,h) (-1, 0)]
+ scan[top    h (   0 ,   0 ) (w,1) ( 0, 1)]
+ scan[bottom h (   0 ,(h-2)) (w,1) ( 0,-1)]
+end

@@ -1,0 +1,8 @@
+# main.4 -- used by: card main / button1 (button)
+on click do
+ play["snap"]
+ t:if options.widgets.mask.value () else 0 dict 32 end
+ gif.frames:target.frames..copy[].map[t]
+ gif.delays:3 take 10
+ write[gif]
+end

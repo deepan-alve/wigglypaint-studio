@@ -1,0 +1,6 @@
+# options.5 -- used by: card options / thumbnail (canvas)
+on view do
+ fr:main.widgets.target.frames
+ fi:(count fr)%sys.frame/5
+ me.paste[fr[fi].copy[] 0,0,me.size]
+end

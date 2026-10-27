@@ -1,0 +1,5 @@
+# alter.11 -- used by: card alter / cancel (contraption); card options / cancel (contraption)
+on finish do
+ play["cancel"]
+ go["main" "BoxOut" 15]
+end

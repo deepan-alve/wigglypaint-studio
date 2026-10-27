@@ -1,0 +1,4 @@
+# options.1 -- used by: card options / mask (button)
+on click do
+ main.event["mask" me.value]
+end

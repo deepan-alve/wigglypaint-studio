@@ -1,0 +1,63 @@
+# alter.0 -- used by: card alter
+on init do
+ reset.event.click
+end
+
+on changemargin do
+ play.click
+ view[]
+end
+
+on shiftcanvas offset do
+ play.click
+ shift.data:((0,0) unless shift.data)+5*offset
+ view[]
+end
+
+on navigate dir do
+ deltas.up   : 0,-1
+ deltas.down : 0, 1
+ deltas.left :-1, 0
+ deltas.right: 1, 0
+ shiftcanvas[deltas[dir]]
+end
+
+on getframe do
+ (first main.widgets.target.frames).copy[]
+end
+
+on scrungle img do
+ if uncrop.value
+  local t:image[dims.size]
+  t.paste[img .5*t.size-img.size]
+  img:t
+ end
+ img.translate[shift.data 1]
+ if mvert.value  img.transform.vert  end
+ if mhoriz.value img.transform.horiz end
+ img
+end
+
+on view do
+ t:main.widgets.target
+ f:scrungle[getframe[]]
+ top   .interval:0,f.size[1]
+ bottom.interval:0,f.size[1]
+ left  .interval:f.size[0],0
+ right .interval:f.size[0],0
+ mvert .show:("solid","invert")[mvert .value]
+ mhoriz.show:("solid","invert")[mhoriz.value]
+
+ preview.size:f.size
+ preview.pos:dims.pos+(dims.size-preview.size)/2
+ preview.show:if options.widgets.mask.value "transparent" else "solid" end
+ preview.paste[f 1]
+ preview.pattern:255 # ANTS!
+ preview.line[left.value,0 left.value,f.size[1]]
+ preview.line[0,top.value  f.size[0],top.value ]
+ preview.line[(f.size[0]-right.value),0  (f.size[0]-right.value),f.size[1]]
+ preview.line[0,(f.size[1]-bottom.value) f.size[0],(f.size[1]-bottom.value)]
+ 
+ fit.locked:(list 0)~keys f.hist
+ uncrop.locked:dims.size~f.size
+end

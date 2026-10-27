@@ -1,0 +1,8 @@
+# wigglyStash.2p -- used by: contraption wigglyStash / recallbutton (button)
+on click do
+ if count data.images
+  card.parent.event.backup
+  card.parent.event["setframes" data.images]
+ end
+end
+

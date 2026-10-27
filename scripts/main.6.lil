@@ -1,0 +1,7 @@
+# main.6 -- used by: card main / button3 (button)
+on click do
+ play["erase2"]
+ h:history.images
+ backup[]
+ setframes[h]
+end

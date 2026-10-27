@@ -1,0 +1,16 @@
+# alter.10 -- used by: card alter / apply (button)
+on click do
+ t:main.widgets.target
+ p:left.value,top.value
+ m:right.value,bottom.value
+ s:preview.size-p+m
+ main.event.backup
+ main.event["setframes"
+  each frame in t.frames
+   scrungle[frame.copy[]].copy[p s]
+  end
+ ]
+ t.animate[]
+ play.scratch
+ go[main "BoxOut" 15]
+end

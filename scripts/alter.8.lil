@@ -1,0 +1,6 @@
+# alter.8 -- used by: card alter / mvert (button)
+on click do
+ play.pencil2
+ me.value:!me.value
+ view[]
+end

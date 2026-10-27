@@ -1,0 +1,8 @@
+# renders: regenerate with build_videos.sh (the ProRes .mov files alone are ~140 MB)
+export/
+
+# local tooling
+.claude/
+__pycache__/
+lyrics.txt
+.playwright-mcp/

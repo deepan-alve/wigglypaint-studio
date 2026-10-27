@@ -1,0 +1,5 @@
+# main.9 -- used by: card main / mhoriz (contraption); card main / mvert (contraption)
+on click do
+ play[("boingoff","boingon")[me.value]]
+ mirror[(mvert.value,mhoriz.value)]
+end

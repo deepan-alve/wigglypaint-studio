@@ -1,0 +1,40 @@
+# main.0 -- used by: card main
+on backup do
+ history.images:target.frames..copy[]
+end
+
+on setframes x do
+ if count x
+  target.size:x[0].size
+  target.pos:dims.pos+.5*dims.size-target.size
+  each frame i in target.frames
+   frame.size:x[i].size
+   frame.paste[x[i]]
+  end
+ end
+end
+
+on mask x do
+ hi32.toggle["transparent" x]
+ target.show:if x "transparent" else "solid" end
+ crop.widgets.preview.show:target.show
+end
+
+on mirror vh do
+ target.mirrormode:vh
+end
+
+on changetool w x do
+ others:w drop extract value where value..def.name like "pop*" from card.widgets
+ others..value:1
+ if !w.value play["pick"] end
+ w.value:0
+ target.brush:x
+ if x~"eraser"
+  sizeLabel.text:"eraser size"
+  markerSizes.valueIndex:toolProps.data.eraser
+ else
+  sizeLabel.text:"marker size"
+  markerSizes.valueIndex:toolProps.data.marker
+ end
+end

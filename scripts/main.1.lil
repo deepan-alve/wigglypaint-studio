@@ -1,0 +1,4 @@
+# main.1 -- used by: card main / pencil (contraption); card main / pen (contraption); card main / Blobby (contraption); card main / StippleTiny (contraption); card main / SoftLrg (contraption); card main / hi36 (contraption); card main / hi39 (contraption); card main / hi33 (contraption); card main / eraser (contraption); card main / hi32 (contraption)
+on click do
+ changetool[me me.name]
+end

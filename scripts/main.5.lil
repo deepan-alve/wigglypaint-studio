@@ -1,0 +1,6 @@
+# main.5 -- used by: card main / button2 (button)
+on click do
+ play["snap"]
+ alter.event.init
+ go[alter "BoxIn" 15]
+end

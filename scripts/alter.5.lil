@@ -1,0 +1,4 @@
+# alter.5 -- used by: card alter / shiftright (button)
+on click do
+ shiftcanvas[1,0]
+end

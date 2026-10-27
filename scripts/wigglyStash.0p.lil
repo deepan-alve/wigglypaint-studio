@@ -1,0 +1,9 @@
+# wigglyStash.0p -- used by: contraption wigglyStash
+on view do
+ preview.clear[]
+ preview.paste[first data.images (0,0),preview.size]
+end
+
+on get_frames   do data.images end
+on set_frames x do data.images:x end
+

@@ -1,0 +1,36 @@
+# popOut.0p -- used by: contraption popOut
+on get_value do v.value end
+on set_value x do v.value:x view[] end
+on get_img do i.value end
+on set_img x do i.value:x view[] end
+on get_speed do 0+s.text end
+on set_speed x do s.text:0|x end
+
+on click do
+ set_value[!get_value[]]
+ card.event["click"]
+end
+on tween a b t do
+ # see easeInOutBack() from easings.net
+ c1:1.70158 c2:1.525
+ a+(b-a)*.5*if !t>.5
+    ((2*t    )^2)*((c2+1)*(   2*t))-c2
+ else
+  2+(((2*t)-2)^2)*((c2+1)*(-2+2*t))+c2
+ end
+end
+on view do
+ img:first i.images
+ c.size:img.size
+ c.show:card.show
+ c.paste[img]
+ tn:0+t.text
+ chg:if tn>v.value -1 elseif v.value>tn 1 else 0 end
+ t.text:0|1&tn+chg*0.03*s.text
+ c.animated:!tn~v.value
+ d:card.size-c.size
+ a:d[1]>d[0]
+ tw:tween[2 d[a]-2 tn]
+ ct:d[!a]/2
+ c.pos:if a ct,tw else tw,ct end
+end

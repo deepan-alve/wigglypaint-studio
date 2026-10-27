@@ -1,0 +1,5 @@
+# colorpicker.2 -- used by: card colorpicker / cancel (button)
+on click do
+ play.cancel
+ go["Back" "StarSpinOut" 15]
+end

@@ -1,0 +1,6 @@
+# wigglyStash.1p -- used by: contraption wigglyStash / stashbutton (button)
+on click do
+ data.images:card.parent.widgets.target.frames..copy[]
+ view[]
+end
+

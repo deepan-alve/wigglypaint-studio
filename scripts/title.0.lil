@@ -1,0 +1,5 @@
+# title.0 -- used by: card title / button1 (button)
+on click do
+ play["scratch"]
+ go["main" "BoxIn"]
+end

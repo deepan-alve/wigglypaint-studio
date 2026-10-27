@@ -1,0 +1,4 @@
+# options.3 -- used by: card options / c36 (button); card options / c39 (button); card options / c33 (button); card options / c47 (button); card options / c32 (button)
+on click do
+ colorpicker.event["init" (0+1 drop me.name)]
+end

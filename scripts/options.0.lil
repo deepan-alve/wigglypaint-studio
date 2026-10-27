@@ -1,0 +1,18 @@
+# options.0 -- used by: card options
+on view do
+ f:"%06H"
+ background.text:f format patterns[32]
+ foreground.text:f format patterns[47]
+ pink      .text:f format patterns[36]
+ cyan      .text:f format patterns[39]
+ yellow    .text:f format patterns[33]
+end
+
+on apply_pal do
+ f:"%06H"
+ patterns[32]:f parse background.text
+ patterns[47]:f parse foreground.text
+ patterns[36]:f parse pink      .text
+ patterns[39]:f parse cyan      .text
+ patterns[33]:f parse yellow    .text
+end

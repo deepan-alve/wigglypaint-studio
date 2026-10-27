@@ -1,0 +1,4 @@
+# alter.3 -- used by: card alter / shiftleft (button)
+on click do
+ shiftcanvas[-1,0]
+end

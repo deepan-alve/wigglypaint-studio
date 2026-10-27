@@ -1,0 +1,6 @@
+# alter.7 -- used by: card alter / uncrop (button); card alter / mhoriz (button)
+on click do
+ play.pencil1
+ me.value:!me.value
+ view[]
+end

@@ -1,0 +1,22 @@
+# imageEnum.0p -- used by: contraption imageEnum
+on get_options do o.value end
+on set_options x do o.value:x view[] x end
+on get_value do o.images[s.value] end
+on get_valueIndex do s.value end
+on set_valueIndex x do s.value:x view[] x end
+
+on view do
+ im:o.images
+ i:im[s.value]
+ s.interval:0,0|(count im)-1
+ s.locked:card.locked
+ s.show  :card.show
+ c.show  :card.show
+ c.clear[]
+ c.paste[i .5*c.size-i.size 1]
+end
+
+on change do
+ card.event["change" get_value[] s.value]
+ view[]
+end

@@ -1,0 +1,12 @@
+# options.4 -- used by: card options / pals (grid)
+on click row do
+ p:"|"split me.rowvalue.palette
+ if 5~count p
+  background.text:p[0]
+  foreground.text:p[1]
+  pink      .text:p[2]
+  cyan      .text:p[3]
+  yellow    .text:p[4]
+  apply_pal[]
+ end
+end

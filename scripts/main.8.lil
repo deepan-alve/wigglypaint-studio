@@ -1,0 +1,13 @@
+# main.8 -- used by: card main / markerSizes (contraption)
+on change img index do
+ play["click"]
+ p:toolProps.data
+ if sizeLabel.text~"marker size"
+  target.hishape:img.encoded
+  p.marker:index
+ else
+  target.ershape:img.encoded
+  p.eraser:index
+ end
+ toolProps.data:p
+end

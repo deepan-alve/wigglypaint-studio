@@ -1,0 +1,27 @@
+# animButton.0p -- used by: contraption animButton
+on view do
+ i:ims.images
+ f:first i
+ c.show:card.show
+ c.clear[]
+ if c.animated
+  s:(range count i),1 drop rev range count i
+  a:floor ai.text/2
+  f:f unless i[s[a]]
+  if a~(count s)-1 c.animated:b.locked:0 card.event["finish"]
+  else ai.text:1+ai.text end
+ end
+ c.paste[f .5*c.size-f.size]
+end
+
+on click do
+ if !b.locked
+  ai.text:0
+  c.animated:b.locked:1
+  view[]
+  card.event["click"]
+ end
+end
+
+on get_images do ims.value end
+on set_images x do ims.value:x end

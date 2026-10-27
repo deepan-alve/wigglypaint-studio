@@ -1,0 +1,6 @@
+# 0 -- used by: deck 
+on navigate do
+ # disable nav gestures/arrow keys;
+ # they have a tendency to activate
+ # unintentionally while drawing
+end

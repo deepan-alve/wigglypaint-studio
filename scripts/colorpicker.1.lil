@@ -1,0 +1,4 @@
+# colorpicker.1 -- used by: card colorpicker / colorR (slider); card colorpicker / colorG (slider); card colorpicker / colorB (slider)
+on change do
+ view[]
+end

@@ -1,0 +1,13 @@
+# alter.9 -- used by: card alter / reset (button)
+on click do
+ play["pick"]
+ top   .value:0
+ left  .value:0
+ right .value:0
+ bottom.value:0
+ mvert .value:0
+ mhoriz.value:0
+ shift.data:0,0
+ uncrop.value:0
+ view[]
+end

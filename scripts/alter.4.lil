@@ -1,0 +1,4 @@
+# alter.4 -- used by: card alter / shiftdown (button)
+on click do
+ shiftcanvas[0,1]
+end

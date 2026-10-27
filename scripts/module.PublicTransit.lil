@@ -1,0 +1,167 @@
+# module.PublicTransit -- used by: -
+dissolveLut:data.dissolveLut
+noiseLut:data.noiseLut
+blindsVertLut:data.blindsVertLut
+blindsHorizLut:data.blindsHorizLut
+
+on lookup c a b t lut do
+ c.merge[lut]
+ c.merge[((floor 255*t) take b),(256 take a)]
+end
+
+on oval pos size do
+ flip pos+size*flip unit 2*pi*(range 20)/20
+end
+
+on star c t rot do
+ o:c.size/2
+ r:(2.5*t)*o
+ i:unit(pi/2)+(pi*rot/2)+(range 10)*(pi/5)
+ p:each v index in i
+  o+(if 2%index 1 else 0.5 end*r)*v
+ end
+ c.poly[p]
+end
+
+on heart c t do
+ o:(0.5,0.6)*c.size
+ r:t*c.size
+ p:each v in (1,0,-1,0)join(0,-1,0,1) o+r*v end
+ c.poly[p]
+ c.poly[oval[o+r*( 1,-1)/2 r/sqrt 2]]
+ c.poly[oval[o+r*(-1,-1)/2 r/sqrt 2]]
+end
+
+clickpos:0,0
+on circleClick c t do c.poly[oval[clickpos t*max c.size]] end
+on circle      c t do c.poly[oval[c.size/2 t*max c.size]] end
+
+on clock c t do
+ pos:c.size/2
+ size:max c.size
+ c.poly[flip pos+size*flip (list 0,0),unit 2*pi*-.25+(range 20*t)/20]
+end
+
+ba:bb:nil
+on BarnHoriz c a b fst t do
+ if fst
+  ba:a.copy[        0,0 a.size/2,1]
+  bb:a.copy[a.size*.5,0 a.size/2,1]
+ end
+ c.paste[b]
+ c.paste[ba              t*a.size/-2,0]
+ c.paste[bb (a.size/2,0)+t*a.size/ 2,0]
+end
+on BarnVert c a b fst t do
+ if fst
+  ba:a.copy[       0, 0 a.size/1,2]
+  bb:a.copy[a.size*0,.5 a.size/1,2]
+ end
+ c.paste[b]
+ c.paste[ba              t*a.size/0,-2]
+ c.paste[bb (a.size/0,2)+t*a.size/0, 2]
+end
+
+transition[on Dissolve       c a b t do lookup[c a b t dissolveLut   ] end]
+transition[on Melt           c a b t do lookup[c a b t noiseLut      ] end]
+transition[on BlindsVert     c a b t do lookup[c a b t blindsVertLut ] end]
+transition[on BlindsHoriz    c a b t do lookup[c a b t blindsHorizLut] end]
+transition[on StarIn         c a b t do star  [c   t 0] c.merge[a b] end]
+transition[on StarOut        c a b t do star  [c 1-t 0] c.merge[b a] end]
+transition[on StarSpinIn     c a b t do star  [c   t t] c.merge[a b] end]
+transition[on StarSpinOut    c a b t do star  [c 1-t t] c.merge[b a] end]
+transition[on HeartIn        c a b t do heart [c   t  ] c.merge[a b] end]
+transition[on HeartOut       c a b t do heart [c 1-t  ] c.merge[b a] end]
+transition[on ClockIn        c a b t do clock [c   t  ] c.merge[a b] end]
+transition[on ClockOut       c a b t do clock [c 1-t  ] c.merge[b a] end]
+transition[on CircleIn       c a b t do circle[c   t  ] c.merge[a b] end]
+transition[on CircleOut      c a b t do circle[c 1-t  ] c.merge[b a] end]
+transition[on CircleInClick  c a b t do if 0~t clickpos:pointer.start end circleClick[c   t] c.merge[a b] end]
+transition[on CircleOutClick c a b t do if 0~t clickpos:pointer.start end circleClick[c 1-t] c.merge[b a] end]
+transition[on StretchDown    c a b t do c.paste[a] c.paste[b (       0    ,  0),      b.size*1,t] end]
+transition[on StretchUp      c a b t do c.paste[a] c.paste[b (c.size*0    ,1-t),(0,1)+b.size*1,t] end]
+transition[on StretchRight   c a b t do c.paste[a] c.paste[b (       0    ,  0),      b.size*t,1] end]
+transition[on StretchLeft    c a b t do c.paste[a] c.paste[b (c.size*(1-t),  0),(1,0)+b.size*t,1] end]
+transition[on RotateDown     c a b t do c.paste[a (c.size*0,t),c.size*   1,1-t ] c.paste[b (       0    ,  0),      c.size*1,t] end]
+transition[on RotateUp       c a b t do c.paste[a (       0,0),c.size*   1,1-t ] c.paste[b (c.size*0    ,1-t),(0,1)+c.size*1,t] end]
+transition[on RotateRight    c a b t do c.paste[a (c.size*t,0),c.size*(1-t),1  ] c.paste[b (       0    ,  0),      c.size*t,1] end]
+transition[on RotateLeft     c a b t do c.paste[a (       0,0),c.size*(1-t),1  ] c.paste[b (c.size*(1-t),  0),(1,0)+c.size*t,1] end]
+transition[on BarnDoorIn     c a b t do BarnHoriz[c a b 0~t   t] end]
+transition[on BarnDoorOut    c a b t do BarnHoriz[c b a 0~t 1-t] end]
+transition[on BlinkIn        c a b t do BarnVert [c a b 0~t   t] end]
+transition[on BlinkOut       c a b t do BarnVert [c b a 0~t 1-t] end]
+transition[on SlitVertIn     c a b t do c.rect[(c.size/2,0)-(   t *c.size/2,0) (c.size*   t ,1)] c.merge[a b] end]
+transition[on SlitVertOut    c a b t do c.rect[(c.size/2,0)-((1-t)*c.size/2,0) (c.size*(1-t),1)] c.merge[b a] end]
+transition[on SlitHorizIn    c a b t do c.rect[(c.size/0,2)-(   t *c.size/0,2) (c.size*1,   t )] c.merge[a b] end]
+transition[on SlitHorizOut   c a b t do c.rect[(c.size/0,2)-((1-t)*c.size/0,2) (c.size*1,(1-t))] c.merge[b a] end]
+
+transition[on PageUp c a b t do
+ c.rect[0,0 c.size*1,.5].merge[b a]
+ if t<.5 i:t*2    c.paste[a.copy[c.size*0,.5 c.size*1,.5] (0,0,0,1)+(0,.5,1,(.5*1-i))*c.size]
+ else    i:2*t-.5 c.paste[b.copy[c.size*0, 0 c.size*1,.5] (0,0,0,1)+(0,(.5*1-i),1,(.5*i))*c.size]
+ end
+end]
+transition[on PageDown c a b t do
+ c.rect[0,0 c.size*1,.5].merge[a b]
+ if t<.5 i:t*2    c.paste[a.copy[c.size*0,.0 c.size*1,.5] (0,0,0,1)+(0,(.5*i),1,(.5*1-i))*c.size]
+ else    i:2*t-.5 c.paste[b.copy[c.size*0,.5 c.size*1,.5] (0,0,0,1)+(0,.5,1,(.5*i))*c.size]
+ end
+end]
+transition[on PageRight c a b t do
+ c.rect[0,0 c.size*.5,1].merge[a b]
+ if t<.5 i:t*2    c.paste[a.copy[c.size*.0,0 c.size*.5,1] (0,0,1,0)+((.5*i),0,(.5*1-i),1)*c.size]
+ else    i:2*t-.5 c.paste[b.copy[c.size*.5,0 c.size*.5,1] (0,0,1,0)+(.5,0,(.5*i),1)*c.size]
+ end
+end]
+transition[on PageLeft c a b t do
+ c.rect[0,0 c.size*.5,1].merge[b a]
+ if t<.5 i:t*2    c.paste[a.copy[c.size*.5,0 c.size*.5,1] (0,0,1,0)+(.5,0,(.5*1-i),1)*c.size]
+ else    i:2*t-.5 c.paste[b.copy[c.size* 0,0 c.size*.5,1] (0,0,1,0)+((.5*1-i),0,(.5*i),1)*c.size]
+ end
+end]
+
+transition[on Wink c a b t do
+ s:if t<.5 c.paste[a] t else c.paste[b] 1-t end
+ c.rect[       0,0 c.size*1, s]
+ c.rect[c.size*0,1 c.size*1,-s]
+end]
+
+module.descs:raze insert k v with
+ "PageDown"       "Stretch the source and destination like flipping a book page down."
+ "PageUp"         "Stretch the source and destination like flipping a book page up."
+ "PageRight"      "Stretch the source and destination like flipping a book page right."
+ "PageLeft"       "Stretch the source and destination like flipping a book page left."
+ "Dissolve"       "A randomized dissolve."
+ "Melt"           "A smoothed noise dissolve."
+ "BlindsVert"     "Vertical Venetian blinds."
+ "BlindsHoriz"    "Horizontal Venetian blinds."
+ "StarIn"         "Star-shaped zoom-in."
+ "StarOut"        "Star-shaped zoom-out."
+ "StarSpinIn"     "Spinning star-shaped zoom-in."
+ "StarSpinOut"    "Spinning star-shaped zoom-out."
+ "HeartIn"        "Heart-shaped zoom-in."
+ "HeartOut"       "Heart-shaped zoom-out."
+ "ClockIn"        "Clockwise pie-slice wipe."
+ "ClockOut"       "Counter-clockwise pie-slice wipe."
+ "CircleIn"       "Circle-shaped zoom-in."
+ "CircleOut"      "Circle-shaped zoom-out."
+ "CircleInClick"  "Circle-shaped zoom-in centered on the user's last click."
+ "CircleOutClick" "Circle-shaped zoom-out centered on the user's last click."
+ "StretchDown"    "Stretch the destination in from the top edge."
+ "StretchUp"      "Stretch the destination in from the bottom edge."
+ "StretchRight"   "Stretch the destination in from the left edge."
+ "StretchLeft"    "Stretch the destination in from the right edge."
+ "RotateDown"     "Stretch the source and destination like rotating a cube down."
+ "RotateUp"       "Stretch the source and destination like rotating a cube up."
+ "RotateRight"    "Stretch the source and destination like rotating a cube right."
+ "RotateLeft"     "Stretch the source and destination like rotating a cube left."
+ "Wink"           "Vertical squint to black, then unsquint to destination."
+ "BarnDoorIn"     "Slide left and right halves apart vertically."
+ "BarnDoorOut"    "Slide left and right halves together vertically."
+ "BlinkIn"        "Slide top and bottom halves apart vertically."
+ "BlinkOut"       "Slide top and bottom halves together vertically."
+ "SlitVertIn"     "Merge in destination in a vertically opening slit."
+ "SlitVertOut"    "Merge in destination in a vertically closing slit."
+ "SlitHorizIn"    "Merge in destination in a horizontally opening slit."
+ "SlitHorizOut"   "Merge in destination in a horizontally closing slit."
+end

@@ -1,0 +1,26 @@
+# colorpicker.0 -- used by: card colorpicker
+PREVIEW:44
+
+on init i do
+ colorIndex.data:i
+ cancel.text:random[
+  "Oh no, this wasn't what I wanted!",
+  "This isn't what I had in mind at all...",
+  "Never mind, I dislike this."
+ ]
+ ok.text:random[
+  "That'll do.",
+  "Sure!",
+  "Make it so!",
+  "I can dig it."
+ ]
+ patterns[PREVIEW]:patterns[i]
+ colorR.value:256%patterns[i]/2^16
+ colorG.value:256%patterns[i]/2^ 8
+ colorB.value:256%patterns[i]
+ go[card "StarSpinIn" 15]
+end
+
+on view do
+ patterns[PREVIEW]:sum(2^16,8,0)*(colorR,colorG,colorB)..value
+end

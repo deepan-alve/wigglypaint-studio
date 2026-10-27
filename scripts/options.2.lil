@@ -1,0 +1,4 @@
+# options.2 -- used by: card options / pink (field); card options / cyan (field); card options / yellow (field); card options / foreground (field); card options / background (field)
+on change do
+ apply_pal[]
+end

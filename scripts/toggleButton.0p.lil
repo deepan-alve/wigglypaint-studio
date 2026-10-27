@@ -1,0 +1,24 @@
+# toggleButton.0p -- used by: contraption toggleButton
+on view do
+ i:extract arg where arg..type="image" from ims.value
+ c.show:card.show
+ c.clear[]
+ if 1~count i
+  f:first i
+  if b.value c.paste[f .5*c.size-f.size] end 
+ end
+ if 2~count i
+  f:i[b.value]
+  c.paste[f .5*c.size-f.size]
+ end
+end
+
+on click do
+ set_value[!get_value[]]
+ card.event["click"]
+end
+
+on get_value do b.value end
+on set_value x do b.value:x view[] end
+on get_images do ims.value end
+on set_images x do ims.value:x end

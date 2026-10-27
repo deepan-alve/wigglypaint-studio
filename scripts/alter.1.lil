@@ -1,0 +1,4 @@
+# alter.1 -- used by: card alter / left (slider); card alter / right (slider); card alter / bottom (slider); card alter / top (slider)
+on change val do
+ changemargin[]
+end

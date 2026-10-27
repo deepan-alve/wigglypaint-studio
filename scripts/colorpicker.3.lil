@@ -1,0 +1,6 @@
+# colorpicker.3 -- used by: card colorpicker / ok (button)
+on click do
+ patterns[colorIndex.data]:patterns[PREVIEW]
+ play.pick
+ go["Back" "StarSpinOut" 15]
+end

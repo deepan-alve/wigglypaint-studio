@@ -1,0 +1,39 @@
+# main.3 -- used by: card main / obliterate (button)
+on oval pos size do
+ flip pos+size*flip unit 2*pi*(range 20)/20
+end
+
+on shake obj tick do
+  local st: 10 # time
+  local sm: 15 # magnitude
+  local sf:0.5 # fade
+  local so:obj.pos
+  while sm>0
+    st:st-1
+    obj.pos:so+random[sm,-sm 2]
+    if st<0 sm:sm-sf end
+    tick[]
+  end
+  obj.pos:so
+end
+
+on click do
+ backup[]
+ play["boom"]
+ t:target.canv
+ local s:()
+ shake[target on tick do
+  t.pattern:0
+  each v in s t.poly[v] end
+  s:each _ in range 5
+   oval[random[max target.size 2] 10+random[30]]
+  end
+  t.pattern:1
+  each v in s t.poly[v] end
+  sleep[] 
+ end]
+ t.pattern:1
+ target.pos:dims.pos
+ target.size:dims.size
+ each f in target.frames f.map[() 0] end
+end
