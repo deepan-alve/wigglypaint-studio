@@ -15,6 +15,10 @@ in one of 13 lettering styles, and the text works in Tamil as well as Latin scri
 
 ## Try it
 
+**In your browser:** <https://deepan-alve.github.io/wigglypaint-studio/>. Nothing to install.
+
+**Locally:**
+
 ```sh
 git clone https://github.com/deepan-alve/wigglypaint-studio
 cd wigglypaint-studio
