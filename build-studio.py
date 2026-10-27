@@ -3,7 +3,7 @@
 
 Re-run after editing any draw-*.js file:  python3 build-studio.py
 """
-import json, pathlib
+import json, pathlib, re
 
 here = pathlib.Path(__file__).parent
 html = (here / "wigglypaint.html").read_text()
@@ -11,6 +11,7 @@ html = (here / "wigglypaint.html").read_text()
 html = html.replace('<script defer src="https://static.itch.io/htmlgame.js" type="text/javascript"></script>', "")
 
 SCRIPTS = [  # (key, button label, file, draws with the mouse simulator?)
+    # a code-drawn scene that never calls lyric(...) is plain art: it draws without lyric text
     ("kajal", "Eye + kajal",         "draw-kajal.js", False),
     ("lolaakku", "Ear + jhumka",     "draw-lolaakku.js", False),
     ("mascara", "Eyelash + mascara", "draw-mascara.js", False),
@@ -25,6 +26,7 @@ SCRIPTS = [  # (key, button label, file, draws with the mouse simulator?)
     ("malli", "Jasmine in her hair",  "draw-malli.js", False),
     ("raani", "Kalli raani",          "draw-raani.js", False),
     ("sooniyam", "Enchantress",       "draw-sooniyam.js", False),
+    ("cat", "Cat with a coffee mug",  "draw-cat.js", False),
     ("apple", "Apple",              "draw-apple.js", True),
     ("pup",   "Puppy",              "draw-pup.js",   True),
     ("robot", "Robot",              "draw-robot.js", True),
@@ -54,7 +56,8 @@ if txt_lines:
     print(f"lyrics.txt: filled {min(len(txt_lines), len(lyric_keys))} of {len(lyric_keys)} scenes"
           + (f" ({len(txt_lines) - len(lyric_keys)} extra line(s) waiting for new scenes)" if len(txt_lines) > len(lyric_keys) else ""))
 fns = ",\n".join(f"{json.dumps(k)}:()=>{{\n{(here / f).read_text()}\n}}" for k, _, f, _ in SCRIPTS)
-meta = json.dumps([{"key": k, "label": l, "slow": s, "lyric": f.startswith("draw-") and not s} for k, l, f, s in SCRIPTS])
+calls_lyric = lambda f: re.search(r"^[^/\n]*\blyric\(", (here / f).read_text(), re.M) is not None   # ignores // comments
+meta = json.dumps([{"key": k, "label": l, "slow": s, "lyric": not s and calls_lyric(f)} for k, l, f, s in SCRIPTS])
 
 panel = r"""
 <!-- the lyric styles need these faces; without the link they only work where the fonts are installed locally -->
@@ -79,10 +82,10 @@ panel = r"""
 #wp-studio.min>*:not(h3){display:none}
 </style>
 <div id="wp-studio">
- <h3 id="wp-drag" title="drag to move">Lyric studio <button id="wp-min" title="minimise">–</button></h3>
+ <h3 id="wp-drag" title="drag to move">WigglyPaint studio <button id="wp-min" title="minimise">–</button></h3>
  <label>Scene<select id="wp-scene"></select></label>
- <label>Lyric, small line<span class="row"><input id="wp-small" placeholder="required"><button class="paste" data-for="wp-small" title="paste">Paste</button></span></label>
- <label>Lyric, big word<span class="row"><input id="wp-big" placeholder="required"><button class="paste" data-for="wp-big" title="paste">Paste</button></span></label>
+ <label>Lyric, small line<span class="row"><input id="wp-small" placeholder="required for lyric scenes"><button class="paste" data-for="wp-small" title="paste">Paste</button></span></label>
+ <label>Lyric, big word<span class="row"><input id="wp-big" placeholder="required for lyric scenes"><button class="paste" data-for="wp-big" title="paste">Paste</button></span></label>
  <label>Lyric, last line<span class="row"><input id="wp-tail" placeholder="optional"><button class="paste" data-for="wp-tail" title="paste">Paste</button></span></label>
  <button class="run" id="wp-draw">Draw scene</button>
  <div id="wp-buttons"></div>
@@ -114,18 +117,18 @@ const run=async m=>{all().forEach(b=>b.disabled=true);
   const sample=Object.values(window.WP_TEXT).join(' ')||'அ';
   await Promise.all(["800 40px 'Noto Sans Tamil'","400 40px 'Anton'","700 26px 'Bebas Neue'","400 40px 'Pacifico'","400 46px 'Antonio'","400 50px 'Luckiest Guy'"].map(f=>document.fonts.load(f,sample)));
   if(m.slow){clear();hint(m.label+': drawing stroke by stroke, the page freezes ~15s…');await wait(60)}
-  const t0=performance.now();SCRIPTS[m.key]();for(let i=0;i<6;i++)tick();sync();
+  const t0=performance.now();(m.fn||SCRIPTS[m.key])();for(let i=0;i<6;i++)tick();sync();
   hint(m.label+' done in '+((performance.now()-t0)/1000).toFixed(1)+'s. EXPORT saves the GIF.')}
  catch(e){hint('Error: '+e.message);console.error(e)}
  finally{all().forEach(b=>b.disabled=false)}};
-// lyric scenes: one drawing + one fixed lyric each. Text is saved per scene in this browser,
-// falling back to lyrics.json baked in at build time. A scene never draws without its lyric.
+// code-drawn scenes go in the dropdown. Lyric scenes pair one drawing with one lyric, saved per scene in this
+// browser and falling back to lyrics.json baked in at build time; they never draw without it. Plain art ignores the boxes.
 const KEY='wp-lyric:';
 const store={get:k=>{try{return JSON.parse(localStorage.getItem(KEY+k))}catch(e){return null}},
              set:(k,v)=>{try{localStorage.setItem(KEY+k,JSON.stringify(v))}catch(e){}}};
-const scenes=META.filter(m=>m.lyric), extras=META.filter(m=>!m.lyric);
+const scenes=META.filter(m=>!m.slow), extras=META.filter(m=>m.slow);
 const lyricOf=k=>store.get(k)||LYRICS[k]||{small:'',big:''};
-for(const m of scenes){const o=document.createElement('option');o.value=m.key;o.textContent=m.label;$('wp-scene').appendChild(o)}
+for(const m of scenes){const o=document.createElement('option');o.value=m.key;o.textContent=m.label+(m.lyric?'':'  (no lyric)');$('wp-scene').appendChild(o)}
 const load=()=>{const l=lyricOf($('wp-scene').value);$('wp-small').value=l.small||'';$('wp-big').value=l.big||'';$('wp-tail').value=l.tail||''};
 const save=()=>store.set($('wp-scene').value,{small:$('wp-small').value.trim(),big:$('wp-big').value.trim(),tail:$('wp-tail').value.trim()});
 $('wp-scene').onchange=load;$('wp-small').oninput=$('wp-big').oninput=$('wp-tail').oninput=save;load();
@@ -133,6 +136,13 @@ $('wp-draw').onclick=()=>run(scenes.find(m=>m.key===$('wp-scene').value));
 for(const m of extras){const b=document.createElement('button');b.className='run';b.textContent=m.label+'  (slow, no lyric)';
  b.onclick=()=>run(m);$('wp-buttons').appendChild(b)}
 $('wp-clear').onclick=async()=>{await ensureMain();clear();hint('Canvas cleared.')};
+// #run=draw-foo.js loads that file from this folder and draws it, without a rebuild: edit, refresh, look.
+// Plain filenames only (letters, digits, - _ and / between them), so the link can't pull in another site's code.
+{const f=decodeURIComponent((location.hash.match(/[#&]run=([^&]+)/)||[])[1]||'');
+ if(/^[\w-]+(\/[\w-]+)*\.js$/.test(f))fetch(f,{cache:'no-store'}).then(r=>{if(!r.ok)throw Error(f+': HTTP '+r.status);return r.text()})
+  .then(src=>{const fn=new Function(src);run({key:'#run',label:f,slow:false,lyric:false,fn})})
+  .catch(e=>{hint('Error: '+e.message);console.error(e)});
+ else if(f)hint('#run wants a file in this folder, like #run=draw-cat.js')}
 $('wp-min').onclick=()=>{const p=$('wp-studio');p.classList.toggle('min');$('wp-min').textContent=p.classList.contains('min')?'+':'–'};
 // drag the panel by its title bar (it can cover the markers otherwise)
 {const p=$('wp-studio');let d=null;

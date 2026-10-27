@@ -1,8 +1,10 @@
 # renders: regenerate with build_videos.sh (the ProRes .mov files alone are ~140 MB)
 export/
 
-# local tooling
-.claude/
+# local tooling (the shipped skill under .claude/skills/ stays tracked)
+!.claude/
+.claude/*
+!.claude/skills/
 __pycache__/
 lyrics.txt
 .playwright-mcp/

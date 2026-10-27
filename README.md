@@ -4,14 +4,27 @@ Code-drawn, boiling-line animations for [WigglyPaint](https://internet-janitor.i
 Write a scene in plain JavaScript (canvas 2D calls), press a button, and it lands in WigglyPaint's
 three animation frames with the hand-drawn wobble. Hit **EXPORT** and you have a looping GIF.
 
+### Showcase: *Sarpatta*, cut to music
+
+[![Lyric cards from the studio, edited to a song from Sarpatta Parambarai. Click to play.](docs/showcase/sarpatta-poster.jpg)](https://deepan-alve.github.io/wigglypaint-studio/docs/showcase/sarpatta.mp4)
+
+A 44-second vertical edit built entirely from studio scenes ([play it](https://deepan-alve.github.io/wigglypaint-studio/docs/showcase/sarpatta.mp4)
+or [download](docs/showcase/sarpatta.mp4)). The song belongs to its rights holders and is **not**
+covered by this repo's MIT license.
+
 | | | |
 |:-:|:-:|:-:|
 | ![kajal](docs/gallery/kajal.gif) | ![raani](docs/gallery/raani.gif) | ![boy](docs/gallery/boy.gif) |
 | ![doll](docs/gallery/doll.gif) | ![bangles](docs/gallery/bangles.gif) | ![sooniyam](docs/gallery/sooniyam.gif) |
 | ![natural](docs/gallery/natural.gif) | ![kolusu](docs/gallery/kolusu.gif) | ![malli](docs/gallery/malli.gif) |
 
-All 14 scenes are in [`docs/gallery/`](docs/gallery). Each pairs a drawing with a lyric line
-in one of 13 lettering styles, and the text works in Tamil as well as Latin script.
+All 14 lyric cards are in [`docs/gallery/`](docs/gallery). Each pairs a drawing with a lyric line
+in one of 13 lettering styles, and the text works in Tamil as well as Latin script. A scene can
+also be plain art with no text, like the cat in [`draw-cat.js`](draw-cat.js).
+
+**Let your AI draw anything.** The repo ships an agent skill. Ask Claude Code (or another coding
+agent) for *"a fox asleep under a lamp, wiggly"* and it writes the scene, checks it in the browser,
+and adds it to the studio. See [Use it with an AI agent](#use-it-with-an-ai-agent).
 
 ## Try it
 
@@ -25,11 +38,12 @@ cd wigglypaint-studio
 python3 -m http.server 8765
 ```
 
-Open <http://localhost:8765/wigglypaint-studio.html>. A **Lyric studio** panel floats in the
+Open <http://localhost:8765/wigglypaint-studio.html>. A **WigglyPaint studio** panel floats in the
 corner (drag it by its title):
 
 1. Pick a scene.
-2. Type or paste the lyric: a small line, a big word, and an optional last line.
+2. For a lyric card, type or paste the lyric: a small line, a big word, and an optional last line.
+   Scenes marked "(no lyric)" ignore the boxes.
 3. **Draw scene**. It takes about a second.
 4. Click **EXPORT** in WigglyPaint (bottom left) to save the GIF.
 
@@ -58,7 +72,12 @@ show();
 }
 ```
 
-Then register it in `SCRIPTS` at the top of [`build-studio.py`](build-studio.py) and rebuild:
+Leave out the `lyric(...)` call and the scene is plain art: it uses the whole canvas and draws
+without any text.
+
+To see it without a rebuild, open `wigglypaint-studio.html#run=draw-<name>.js`. The page loads
+the file from disk and draws it. Edit, reload, look. When it's right, register it in `SCRIPTS`
+at the top of [`build-studio.py`](build-studio.py) and rebuild:
 
 ```sh
 python3 build-studio.py      # rewrites wigglypaint-studio.html
@@ -67,8 +86,8 @@ python3 build-studio.py      # rewrites wigglypaint-studio.html
 ### The `lyricKit()` API
 
 Everything lives in [`lyric-lib.js`](lyric-lib.js). Coordinates are deck pixels: the deck is
-512×342 and the drawing area sits at (5,22), 355×261. The lyric column is on the right
-(x ≈ 200–356), so put your drawing on the left.
+512×342 and the drawing area sits at (5,22), 355×261. On a lyric card the text column is on the
+right (x ≈ 200–356), so put the drawing on the left. Plain art can use the whole area.
 
 | Call | What it does |
 |---|---|
@@ -99,15 +118,26 @@ and the page freezes while it runs), but the result is real WigglyPaint brushwor
 in the panel as "(slow, no lyric)". You can also paste them straight into the devtools console
 of plain `wigglypaint.html`.
 
-## Use it with Claude Code
+## Use it with an AI agent
 
-[`skill/wigglypaint-scene/SKILL.md`](skill/wigglypaint-scene/SKILL.md) teaches an AI coding agent
-the workflow above. Install it and you can ask for a scene in plain words, like *"a cat holding
-a coffee cup, banner style"*:
+[`.claude/skills/wigglypaint-art/SKILL.md`](.claude/skills/wigglypaint-art/SKILL.md) teaches an
+AI coding agent the whole workflow: plan the picture, write the scene, open it with `#run=`,
+look at a screenshot, fix it, then register and build. Ask for anything in plain words, like
+*"a cat holding a coffee cup"* or *"a lighthouse in a storm, with the lyric 'hold on | tonight'"*.
 
-```sh
-cp -r skill/wigglypaint-scene ~/.claude/skills/
-```
+- **Claude Code, inside this repo:** nothing to install. Claude Code loads skills from
+  `.claude/skills/` automatically.
+- **Claude Code, anywhere:** install it globally. When you ask for wiggly art outside a checkout,
+  the skill clones the studio first.
+
+  ```sh
+  npx skills add deepan-alve/wigglypaint-studio
+  ```
+
+- **Other agents** (Codex, Cursor, Gemini CLI, …): [`AGENTS.md`](AGENTS.md) points them to the same
+  instructions. The `npx skills` command above also installs for many of them.
+
+The skill tells agents to draw original subjects, not copyrighted characters or logos.
 
 ## Exporting for video
 
@@ -126,6 +156,7 @@ base64 POSTs into `export/`, for saving frames from the browser.
 | `build-studio.py` | Builds the studio from the original + `lyric-lib.js` + `draw-*.js` + `lyrics.json` |
 | `lyric-lib.js` | `lyricKit()`: layers, wobble, backdrop, and the 13 lyric styles |
 | `draw-*.js` | One file per scene |
+| `.claude/skills/wigglypaint-art/` | The agent skill. `AGENTS.md` points other agents to it |
 | `lyrics.json` / `lyrics.txt` | Default lyrics baked in at build time. `lyrics.txt` (git-ignored) takes one line per scene, `small \| big \| tail`. |
 | `scripts/`, `extract.py` | WigglyPaint's internal Lil scripts, split out for reading |
 
